@@ -1,9 +1,9 @@
-const require = require('express');
+const express = require('express');
 const router = express.Router();
-const controller = require('../controller.consultar');
+const controller = require('../controllers/matricula.controller');
 
 router.get('/consultar', controller.consultar);
-router.post('/consultar', controller.inserir);
+router.post('/inserir', controller.inserir);
 router.delete('/cancelar', controller.cancelar);
 
 module.exports = router;

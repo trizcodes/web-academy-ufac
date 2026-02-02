@@ -1,11 +1,11 @@
-const express = require (`express`);
+const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/nota.controller');
-const validadId = require ('../middlewares/validarId.middleware')
+const validarId = require('../middlewares/validarId.middleware');
 
 router.get('/consultar', controller.consultar);
 router.post('/inserir', controller.inserir);
-router.put('/alterar', controller.alterar);
-router.delete('/excluir', controller.excluir);
+router.put('/alterar', validarId, controller.alterar);
+router.delete('/excluir', validarId, controller.excluir);
 
 module.exports = router;
