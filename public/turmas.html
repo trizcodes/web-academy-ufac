@@ -1,91 +1,272 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gestão Escolar</title>
-  <link rel="stylesheet" href="stylesheets/style.css">
+    <meta charset="UTF-8">
+    <title>Gestão de Turmas</title>
+    <link rel="stylesheet" href="./stylesheets/style.css">
 </head>
-
 <body>
-  <nav>
-    <ul>
-        <li><a href="aluno.html">Alunos</a></li>
-        <li><a href="disciplinas.html">Disciplinas</a></li>
-        <li><a href="professores.html">Professores</a></li>
-        <li><a href="salas.html">Salas</a></li>
-        <li><a href="turmas.html">Turmas</a></li>
-    </ul>
-  </nav>
-  <main>
-    <h2>Gerenciar Alunos</h2>
-    <section>
-        <h3>Lista de alunos</h3>
-        <button>Inserir Novo Aluno</button>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Data de Nascimento</th>
-                    <th>E-mail</th>
-                    <th>Endereço</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>João da Silva</td>
-                    <td>01/01/2014</td>
-                    <td>joao@gmail.com</td>
-                    <td>Rua da Flores, 123</td>
-                    <td>
-                        <div>
-                            <button>Matricula</button>
-                            <button>Editar</button>
-                            <button>Excluir</button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Maria da Silva</td>
-                    <td>01/01/2020</td>
-                    <td>mariasilva@gmail.com</td>
-                    <td>Rua dos passaros, 123</td>
-                    <td>
-                        <div>
-                            <button>Matricula</button>
-                            <button>Editar</button>
-                            <button>Excluir</button>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
-    <section>
-        <h3>Adicionar/Editar Aluno</h3>
-        <form>
+    <nav>
+        <ul>
+            <li><a href="aluno.html">Alunos</a></li>
+            <li><a href="disciplinas.html">Disciplinas</a></li>
+            <li><a href="professores.html">Professores</a></li>
+            <li><a href="salas.html">Salas</a></li>
+            <li><a href="turmas.html">Turmas</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Gerenciar Turmas</h2>
 
-        <label for="Nome">Nome</label>
-        <input type="text" name="nome" id="nome" required>
+        <section id="tela-turmas">
+            <h3>Lista de Turmas</h3>
+            <form id="formTurma">
+                <label>Código</label>
+                <input type="text" id="codigo" required>
+                <label>Ano Letivo</label>
+                <input type="number" id="ano_letivo" required>
+                <label>Sala</label>
+                <select id="sala_id" required>
+                    <option value="">Carregando...</option>
+                </select>
+                <button type="submit">Criar Turma</button>
+            </form>
+            <br>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Ano</th>
+                        <th>Sala</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tbTurmas"></tbody>
+            </table>
+        </section>
+
+        <section id="tela-alunos" class="hidden">
+            <h3>Alunos da Turma: <span id="tituloTurma"></span></h3>
+            <button onclick="voltarParaTurmas()">Voltar</button>
+            <br><br>
+            
+            <form id="formMatricula">
+                <label>Matricular Aluno</label>
+                <select id="selectAlunosParaMatricula"></select>
+                <button type="submit">Matricular</button>
+            </form>
+            <br>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome do Aluno</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tbAlunosTurma"></tbody>
+            </table>
+        </section>
+
+        <section id="tela-notas" class="hidden">
+            <h3>Notas de: <span id="tituloAluno"></span></h3>
+            <button onclick="voltarParaAlunos()">Voltar</button>
+            <br><br>
+
+            <form id="formNota">
+                <label>Disciplina</label>
+                <select id="selectDisciplinaNota"></select>
+                <label>Nota (0-10)</label>
+                <input type="number" id="valorNota" step="0.1" required>
+                <button type="submit">Lançar Nota</button>
+            </form>
+            <br>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Disciplina</th>
+                        <th>Nota</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tbNotas"></tbody>
+            </table>
+        </section>
+    </main>
+
+    <script>
+        const API = 'http://localhost:3000';
+        let turmaAtual = null;
+        let alunoAtual = null;
+
+        window.onload = () => {
+            listarTurmas();
+            carregarSalas();
+        };
+
         
-        <label for="data_de_nascimento"> Data de Nascimento</label>
-        <input type="date" name="data_de_nascimento" id="data_de_nascimento" required>
+        function mostrarTela(idTela) {
+            
+            ['tela-turmas', 'tela-alunos', 'tela-notas'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(idTela).classList.remove('hidden');
+        }
 
-        <label for="email">E-mail</label>
-        <input type="email" name="email" id="email" required>
+        function voltarParaTurmas() { mostrarTela('tela-turmas'); }
+        function voltarParaAlunos() { mostrarTela('tela-alunos'); }
 
-        <label for="endereco">Endereço</label>
-        <input type="text" name="endereco" id="endereco" required>
+       
+        async function listarTurmas() {
+            const res = await fetch(`${API}/turmas/consultar`);
+            const dados = await res.json();
+            const tb = document.getElementById('tbTurmas');
+            tb.innerHTML = '';
+            dados.forEach(t => {
+                const sala = t.bloco ? `Bl.${t.bloco}-${t.numero}` : 'Sem Sala';
+                tb.innerHTML += `
+                    <tr>
+                        <td>${t.codigo}</td>
+                        <td>${t.ano_letivo}</td>
+                        <td>${sala}</td>
+                        <td>
+                            <button onclick="abrirAlunos(${t.id}, '${t.codigo}')">Ver Alunos</button>
+                            <button onclick="excluirTurma(${t.id})">Excluir</button>
+                        </td>
+                    </tr>`;
+            });
+        }
 
-        <input type="submit" value="Salvar">
+        async function carregarSalas() {
+            const res = await fetch(`${API}/salas/consultar`);
+            const dados = await res.json();
+            const sel = document.getElementById('sala_id');
+            sel.innerHTML = '<option value="">Selecione...</option>';
+            dados.forEach(s => sel.innerHTML += `<option value="${s.id}">Bl. ${s.bloco} - ${s.numero}</option>`);
+        }
 
-        </form>
-    </section>
-  </main>
-  
+        document.getElementById('formTurma').onsubmit = async (e) => {
+            e.preventDefault();
+            await fetch(`${API}/turmas/inserir`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    codigo: document.getElementById('codigo').value,
+                    ano_letivo: document.getElementById('ano_letivo').value,
+                    sala_id: document.getElementById('sala_id').value
+                })
+            });
+            listarTurmas();
+            document.getElementById('formTurma').reset();
+        };
+
+    
+        async function abrirAlunos(id, codigo) {
+            turmaAtual = id;
+            document.getElementById('tituloTurma').innerText = codigo;
+            mostrarTela('tela-alunos');
+            listarAlunosDaTurma();
+            carregarSelectAlunos();
+        }
+
+        async function listarAlunosDaTurma() {
+            const res = await fetch(`${API}/matriculas/consultar?turma_id=${turmaAtual}`);
+            const dados = await res.json();
+            const tb = document.getElementById('tbAlunosTurma');
+            tb.innerHTML = '';
+            
+            if(dados.message) return; 
+
+            dados.forEach(m => {
+                tb.innerHTML += `
+                    <tr>
+                        <td>${m.nome}</td>
+                        <td>
+                            <button onclick="abrirNotas(${m.aluno_id}, '${m.nome}')">Notas</button>
+                            <button onclick="cancelarMatricula(${m.aluno_id})">Remover</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        async function carregarSelectAlunos() {
+            const res = await fetch(`${API}/aluno/consultar`);
+            const dados = await res.json();
+            const sel = document.getElementById('selectAlunosParaMatricula');
+            sel.innerHTML = '';
+            dados.forEach(a => sel.innerHTML += `<option value="${a.id}">${a.nome}</option>`);
+        }
+
+        document.getElementById('formMatricula').onsubmit = async (e) => {
+            e.preventDefault();
+            await fetch(`${API}/matriculas/inserir`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ aluno_id: document.getElementById('selectAlunosParaMatricula').value, turma_id: turmaAtual })
+            });
+            listarAlunosDaTurma();
+        }
+
+       
+        async function abrirNotas(id, nome) {
+            alunoAtual = id;
+            document.getElementById('tituloAluno').innerText = nome;
+            mostrarTela('tela-notas');
+            listarNotasDoAluno();
+            carregarDisciplinas();
+        }
+
+        async function listarNotasDoAluno() {
+            const res = await fetch(`${API}/notas/consultar?aluno_id=${alunoAtual}&turma_id=${turmaAtual}`);
+            const dados = await res.json();
+            const tb = document.getElementById('tbNotas');
+            tb.innerHTML = '';
+            if(dados.message) return;
+
+            dados.forEach(n => {
+                tb.innerHTML += `
+                    <tr>
+                        <td>${n.nome}</td> <td>${n.nota}</td>
+                        <td><button onclick="excluirNota(${n.id})">Excluir</button></td>
+                    </tr>`;
+            });
+        }
+
+        async function carregarDisciplinas() {
+            const res = await fetch(`${API}/disciplinas/consultar`);
+            const dados = await res.json();
+            const sel = document.getElementById('selectDisciplinaNota');
+            sel.innerHTML = '';
+            dados.forEach(d => sel.innerHTML += `<option value="${d.id}">${d.nome}</option>`);
+        }
+
+        document.getElementById('formNota').onsubmit = async (e) => {
+            e.preventDefault();
+            await fetch(`${API}/notas/inserir`, {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ 
+                    aluno_id: alunoAtual, 
+                    turma_id: turmaAtual, 
+                    disciplina_id: document.getElementById('selectDisciplinaNota').value,
+                    nota: document.getElementById('valorNota').value 
+                })
+            });
+            listarNotasDoAluno();
+            document.getElementById('valorNota').value = '';
+        }
+
+        async function excluirNota(id) {
+            await fetch(`${API}/notas/excluir?id=${id}`, { method: 'DELETE' });
+            listarNotasDoAluno();
+        }
+        
+        async function excluirTurma(id) {
+             await fetch(`${API}/turmas/excluir?id=${id}`, { method: 'DELETE' });
+             listarTurmas();
+        }
+        
+        async function cancelarMatricula(idAluno) {
+             await fetch(`${API}/matriculas/cancelar?aluno_id=${idAluno}&turma_id=${turmaAtual}`, { method: 'DELETE' });
+             listarAlunosDaTurma();
+        }
+    </script>
 </body>
 </html>

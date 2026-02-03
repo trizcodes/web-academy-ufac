@@ -1,80 +1,183 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Gestão Escolar - Professores</title>
-  <link rel="stylesheet" href="stylesheets/style.css">
+    <meta charset="UTF-8">
+    <title>Gestão de Professores</title>
+    <link rel="stylesheet" href="./stylesheets/style.css">
 </head>
-
 <body>
-  <nav>
-    <ul>
-        <li><a href="aluno.html">Alunos</a></li>
-        <li><a href="disciplinas.html">Disciplinas</a></li>
-        <li><a href="professores.html">Professores</a></li>
-        <li><a href="salas.html">Salas</a></li>
-        <li><a href="turmas.html">Turmas</a></li>
-    </ul>
-  </nav>
+    <nav>
+        <ul>
+            <li><a href="aluno.html">Alunos</a></li>
+            <li><a href="disciplinas.html">Disciplinas</a></li>
+            <li><a href="professores.html">Professores</a></li>
+            <li><a href="salas.html">Salas</a></li>
+            <li><a href="turmas.html">Turmas</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Gerenciar Professores</h2>
 
-  <main>
-    <h2>Gerenciar Professores</h2>
-    
-    <section>
-        <h3>Lista de Professores</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>E-mail</th>
-                    <th>Data de Nascimento</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Carlos Alcântara</td>
-                    <td>carlos.prof@escola.com</td>
-                    <td>15/05/1980</td>
-                    <td>
-                        <button>Editar</button>
-                        <button>Excluir</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Ana Beatriz</td>
-                    <td>ana.b@escola.com</td>
-                    <td>20/08/1992</td>
-                    <td>
-                        <button>Editar</button>
-                        <button>Excluir</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </section>
+        <section id="tela-professores">
+            <h3>Lista de Professores</h3>
+            <form id="formProfessor">
+                <label>Nome</label>
+                <input type="text" id="nome" required>
+                <label>Email</label>
+                <input type="email" id="email" required>
+                <label>Nascimento</label>
+                <input type="date" id="data_nascimento" required>
+                <label>Endereço</label>
+                <input type="text" id="endereco">
+                <button type="submit">Salvar</button>
+            </form>
+            <br>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tbProfessores"></tbody>
+            </table>
+        </section>
 
-    <section>
-        <h3>Adicionar Novo Professor</h3>
-        <form>
-            <label for="nome">Nome Completo</label>
-            <input type="text" id="nome" required placeholder="Ex: João Silva">
+        <section id="tela-vinculos" class="hidden">
+            <h3>Vínculos de: <span id="nomeProfessorVinculo"></span></h3>
+            <button onclick="voltar()">Voltar</button>
+            <br><br>
 
-            <label for="email">E-mail</label>
-            <input type="email" id="email" required placeholder="Ex: joao@email.com">
+            <form id="formVinculo">
+                <label>Disciplina</label>
+                <select id="selDisciplina"></select>
+                <label>Turma</label>
+                <select id="selTurma"></select>
+                <button type="submit">Adicionar Vínculo</button>
+            </form>
+            <br>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Disciplina</th>
+                        <th>Turma</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="tbVinculos"></tbody>
+            </table>
+        </section>
+    </main>
 
-            <label for="nascimento">Data de Nascimento</label>
-            <input type="date" id="nascimento" required>
+    <script>
+        const API = 'http://localhost:3000';
+        let profAtual = null;
 
-            <label for="endereco">Endereço</label>
-            <input type="text" id="endereco" required>
+        window.onload = listarProfessores;
 
-            <input type="submit" value="Salvar Professor">
-        </form>
-    </section>
-  </main>
+        async function listarProfessores() {
+            const res = await fetch(`${API}/professores/consultar`);
+            const dados = await res.json();
+            const tb = document.getElementById('tbProfessores');
+            tb.innerHTML = '';
+            dados.forEach(p => {
+                tb.innerHTML += `
+                    <tr>
+                        <td>${p.nome}</td>
+                        <td>${p.email}</td>
+                        <td>
+                            <button onclick="abrirVinculos(${p.id}, '${p.nome}')">Vínculos</button>
+                            <button onclick="excluirProf(${p.id})">Excluir</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        document.getElementById('formProfessor').onsubmit = async (e) => {
+            e.preventDefault();
+            await fetch(`${API}/professores/inserir`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    nome: document.getElementById('nome').value,
+                    email: document.getElementById('email').value,
+                    data_nascimento: document.getElementById('data_nascimento').value,
+                    endereco: document.getElementById('endereco').value
+                })
+            });
+            listarProfessores();
+            document.getElementById('formProfessor').reset();
+        };
+
+        async function excluirProf(id) {
+            await fetch(`${API}/professores/excluir?id=${id}`, { method: 'DELETE' });
+            listarProfessores();
+        }
+
+        async function abrirVinculos(id, nome) {
+            profAtual = id;
+            document.getElementById('nomeProfessorVinculo').innerText = nome;
+            document.getElementById('tela-professores').classList.add('hidden');
+            document.getElementById('tela-vinculos').classList.remove('hidden');
+            
+            listarVinculos();
+            carregarSelectsVinculo();
+        }
+
+        function voltar() {
+            document.getElementById('tela-vinculos').classList.add('hidden');
+            document.getElementById('tela-professores').classList.remove('hidden');
+        }
+
+        async function listarVinculos() {
+            const res = await fetch(`${API}/vinculos/consultar-por-professor/${profAtual}`);
+            const dados = await res.json();
+            const tb = document.getElementById('tbVinculos');
+            tb.innerHTML = '';
+            
+            if(dados.message) return;
+
+            dados.forEach(v => {
+                tb.innerHTML += `
+                    <tr>
+                        <td>${v.disciplina}</td> <td>${v.turma_codigo}</td> <td>
+                            <button onclick="encerrarVinculo(${v.disciplina_id}, ${v.turma_id})">Encerrar</button>
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        async function carregarSelectsVinculo() {
+            const r1 = await fetch(`${API}/disciplinas/consultar`);
+            const d1 = await r1.json();
+            document.getElementById('selDisciplina').innerHTML = d1.map(d => `<option value="${d.id}">${d.nome}</option>`).join('');
+
+            const r2 = await fetch(`${API}/turmas/consultar`);
+            const d2 = await r2.json();
+            document.getElementById('selTurma').innerHTML = d2.map(t => `<option value="${t.id}">${t.codigo}</option>`).join('');
+        }
+
+        document.getElementById('formVinculo').onsubmit = async (e) => {
+            e.preventDefault();
+            await fetch(`${API}/vinculos/inserir`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    professor_id: profAtual,
+                    disciplina_id: document.getElementById('selDisciplina').value,
+                    turma_id: document.getElementById('selTurma').value
+                })
+            });
+            listarVinculos();
+        };
+
+        async function encerrarVinculo(discId, turmaId) {
+            await fetch(`${API}/vinculos/encerrar?disciplina_id=${discId}&professor_id=${profAtual}&turma_id=${turmaId}`, {
+                method: 'DELETE'
+            });
+            listarVinculos();
+        }
+    </script>
 </body>
 </html>
