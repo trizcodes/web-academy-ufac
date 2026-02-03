@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Gestão Escolar - Disciplinas</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <nav>
+    <ul>
+        <li><a href="aluno.html">Alunos</a></li>
+        <li><a href="disciplinas.html">Disciplinas</a></li>
+        <li><a href="professores.html">Professores</a></li>
+        <li><a href="salas.html">Salas</a></li>
+        <li><a href="turmas.html">Turmas</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h2>Gerenciar Disciplinas</h2>
+
+    <section>
+        <h3>Lista de Disciplinas</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome da Disciplina</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Programação Web Front-End</td>
+                    <td>
+                        <button>Editar</button>
+                        <button>Excluir</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Banco de Dados</td>
+                    <td>
+                        <button>Editar</button>
+                        <button>Excluir</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Matemática Discreta</td>
+                    <td>
+                        <button>Editar</button>
+                        <button>Excluir</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h3>Adicionar Nova Disciplina</h3>
+        <form>
+            <label for="nome">Nome da Disciplina</label>
+            <input type="text" id="nome" required placeholder="Ex: Engenharia de Software">
+
+            <input type="submit" value="Salvar Disciplina">
+        </form>
+    </section>
+  </main>
+</body>
+</html>

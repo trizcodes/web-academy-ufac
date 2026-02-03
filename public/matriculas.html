@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão Escolar</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <nav>
+    <li><a href="aluno.html">Alunos</a></li>
+    <li><a href="disciplinas.html">Disciplinas</a></li>
+    <li><a href="professores.html">Professores</a></li>
+    <li><a href="salas.html">Salas</a></li>
+    <li><a href="turmas.html">Turmas</a></li>
+  </nav>
+  <main>
+    <h2>Matrículas do Aluno</h2>
+    <section>
+        <h3>Nome do Aluno: Maria Silva</h3>
+    </section>
+    <section>
+        <table>
+            <thead>
+                <tr>
+                    <th>Código da Turma</th>
+                    <th>Ano Letivo</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1EFA</td>
+                    <td>2023</td>
+                    <td>
+                        <div>
+                            <button>Cancelar Matricula</button>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>1EFA</td>
+                    <td>2023</td>
+                    <td>
+                        <div>
+                            <button>Cancelar Matricula</button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+    <section>
+        <h3>Inserir Nova Matricula</h3>
+        <form>
+            <label for="turma_id">Turma</label>
+            <select name="turma_id" id="turma_id" required>
+                <option value="">Selecione</option>
+                <option value="1">1EFA</option>
+                <option value="2">1EFB</option>
+                <option value="3">2EFA</option>
+            </select>
+            <input type="submit" value="Salvar">
+        </form>
+    </section>
+  </main>
+  
+</body>
+</html>
